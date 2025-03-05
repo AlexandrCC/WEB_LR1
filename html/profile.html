@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <title>Pomodoro Timer - Profile</title>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- HEADER -->
+    <header class="header bg-orange">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-orange">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="../index.html">Pomodoro Timer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="../index.html">Main</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="pomodoro.html">Timer</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="about.html">About</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="signup.html">Sign up</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="signin.html">Sign in</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="page">
+      <div class="container main-content">
+        <h2 class="mb-4 text-center">User Profile</h2>
+        <div class="alert alert-warning text-center" role="alert">
+          Please sign in to view your profile details.
+        </div>
+        <table class="table table-bordered table-striped">
+          <tbody>
+            <tr>
+              <th>Nickname</th>
+              <td>Unknown</td>
+            </tr>
+            <tr>
+              <th>Email</th>
+              <td>Unknown</td>
+            </tr>
+            <tr>
+              <th>Phone</th>
+              <td>Unknown</td>
+            </tr>
+            <tr>
+              <th>Gender</th>
+              <td>Unknown</td>
+            </tr>
+            <tr>
+              <th>Completed Pomodoro Sessions</th>
+              <td>0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer bg-orange">
+      <div class="container-fluid">
+        <div class="text-center text-white p-2">
+          2025 Pomodoro Timer ©
+        </div>
+      </div>
+    </footer>
+  </div>
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
