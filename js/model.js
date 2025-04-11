@@ -1,13 +1,12 @@
 // js/model.js
 
-// Модель таймера (Pomodoro)
 export class TimerModel {
   constructor() {
-    this.duration = 25 * 60; // 25 хвилин
+    this.duration = 25 * 60; // 25 minutes
     this.remaining = this.duration;
-    this.sessionCounter = parseInt(localStorage.getItem("pomodoroSessions")) || 0;
+    this.sessionCounter = parseInt(localStorage.getItem("pomSessions")) || 0;
   }
-  
+
   decrement() {
     if (this.remaining > 0) {
       this.remaining--;
@@ -15,67 +14,38 @@ export class TimerModel {
     }
     return false;
   }
-  
+
   reset() {
     this.remaining = this.duration;
   }
-  
+
   incrementSession() {
     this.sessionCounter++;
-    localStorage.setItem("pomodoroSessions", this.sessionCounter);
+    localStorage.setItem("pomSessions", this.sessionCounter);
   }
 }
 
-// Модель завдань (To‑Do List)
 export class TaskModel {
   constructor() {
-    this.tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    this.tasks = JSON.parse(localStorage.getItem("pomTasks")) || [];
   }
-  
-  addTask(task) {
-    this.tasks.push(task);
+
+  addTask(txt) {
+    this.tasks.push(txt);
     this.save();
   }
-  
-  editTask(index, newTask) {
-    if (index >= 0 && index < this.tasks.length) {
-      this.tasks[index] = newTask;
-      this.save();
-    }
-  }
-  
-  removeTask(index) {
-    if (index >= 0 && index < this.tasks.length) {
-      this.tasks.splice(index, 1);
-      this.save();
-    }
-  }
-  
-  save() {
-    localStorage.setItem("tasks", JSON.stringify(this.tasks));
-  }
-}
 
-// Модель користувача (авторизація)
-export class UserModel {
-  constructor() {
-    this.user = JSON.parse(localStorage.getItem("user")) || null;
+  editTask(idx, newText) {
+    this.tasks[idx] = newText;
+    this.save();
   }
-  
-  register(userData) {
-    localStorage.setItem("user", JSON.stringify(userData));
-    this.user = userData;
+
+  deleteTask(idx) {
+    this.tasks.splice(idx, 1);
+    this.save();
   }
-  
-  login(email, password) {
-    if (this.user && this.user.email === email && this.user.password === password) {
-      return true;
-    }
-    return false;
-  }
-  
-  logout() {
-    localStorage.removeItem("user");
-    this.user = null;
+
+  save() {
+    localStorage.setItem("pomTasks", JSON.stringify(this.tasks));
   }
 }

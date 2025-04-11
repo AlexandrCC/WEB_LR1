@@ -1,153 +1,104 @@
 // js/controller.js
-import { TimerModel, TaskModel, UserModel } from "./model.js";
-import { TimerView, TaskView, UserView } from "./view.js";
+import { TimerModel, TaskModel } from "./model.js";
+import { TimerView, TaskView } from "./view.js";
 
-/** Контролер для таймера та тасків */
 export class AppController {
   constructor(timerModel, taskModel, timerView, taskView) {
     this.timerModel = timerModel;
     this.taskModel = taskModel;
     this.timerView = timerView;
     this.taskView = taskView;
-    this.timerInterval = null;
-    
-    // Прив'язка методів
-    this.onStartTimer = this.onStartTimer.bind(this);
-    this.onResetTimer = this.onResetTimer.bind(this);
-    this.onAddTask = this.onAddTask.bind(this);
-    this.onTaskListClick = this.onTaskListClick.bind(this);
+
+    this.timer = null;
+    this.decrementTime = this.decrementTime.bind(this);
+
+    this.handleAddTask = this.handleAddTask.bind(this);
+    this.handleEditTask = this.handleEditTask.bind(this);
+    this.handleDeleteTask = this.handleDeleteTask.bind(this);
+
+    this.onStart = this.onStart.bind(this);
+    this.onReset = this.onReset.bind(this);
   }
-  
+
   init() {
-    // Початкове відображення
-    if (this.timerView)
-      this.timerView.render(this.timerModel.remaining, this.timerModel.sessionCounter);
-    if (this.taskView)
-      this.taskView.render(this.taskModel.tasks);
-    
-    // Прив'язка подій за ID
-    const startBtn = document.getElementById("startTimerBtn");
-    const resetBtn = document.getElementById("resetTimerBtn");
-    const addTaskBtn = document.getElementById("addTaskBtn");
+    // Render initial timer, sessions, tasks
+    this.timerView.renderTimer(this.timerModel.remaining);
+    this.timerView.renderSessions(this.timerModel.sessionCounter);
+    this.taskView.render(this.taskModel.tasks);
+
+    // Set up event listeners
+    const btnStart = document.getElementById("startTimerBtn");
+    const btnReset = document.getElementById("resetTimerBtn");
+    const btnAddTask = document.getElementById("addTaskBtn");
+    const taskList = document.getElementById("taskList");
     const taskInput = document.getElementById("taskInput");
-    
-    if (startBtn) startBtn.addEventListener("click", this.onStartTimer);
-    if (resetBtn) resetBtn.addEventListener("click", this.onResetTimer);
-    if (addTaskBtn) addTaskBtn.addEventListener("click", this.onAddTask);
+
+    if (btnStart) btnStart.addEventListener("click", this.onStart);
+    if (btnReset) btnReset.addEventListener("click", this.onReset);
+    if (btnAddTask) btnAddTask.addEventListener("click", this.handleAddTask);
+
+    // Listen for custom events from TaskView
+    if (taskList) {
+      taskList.addEventListener("editTask", this.handleEditTask);
+      taskList.addEventListener("deleteTask", this.handleDeleteTask);
+    }
+
+    // Optionally handle "Enter" key for adding tasks
     if (taskInput) {
       taskInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") this.onAddTask();
+        if (e.key === "Enter") {
+          this.handleAddTask();
+        }
       });
     }
-    
-    const taskListEl = document.getElementById("taskList");
-    if (taskListEl) taskListEl.addEventListener("click", this.onTaskListClick);
   }
-  
-  onStartTimer() {
-    if (this.timerInterval) clearInterval(this.timerInterval);
-    this.timerInterval = setInterval(() => {
-      if (this.timerModel.decrement()) {
-        this.timerView.render(this.timerModel.remaining, this.timerModel.sessionCounter);
-      } else {
-        clearInterval(this.timerInterval);
-        this.timerView.showAlert("Time's up! Take a break.");
-        this.timerModel.incrementSession();
-        this.timerModel.reset();
-        this.timerView.render(this.timerModel.remaining, this.timerModel.sessionCounter);
-      }
-    }, 1000);
+
+  decrementTime() {
+    if (this.timerModel.decrement()) {
+      this.timerView.renderTimer(this.timerModel.remaining);
+    } else {
+      clearInterval(this.timer);
+      this.timerView.showAlert("Time's up! Take a break.");
+      this.timerModel.incrementSession();
+      this.timerModel.reset();
+      this.timerView.renderTimer(this.timerModel.remaining);
+      this.timerView.renderSessions(this.timerModel.sessionCounter);
+    }
   }
-  
-  onResetTimer() {
-    if (this.timerInterval) clearInterval(this.timerInterval);
+
+  onStart() {
+    clearInterval(this.timer);
+    this.timer = setInterval(this.decrementTime, 1000);
+  }
+
+  onReset() {
+    clearInterval(this.timer);
     this.timerModel.reset();
-    this.timerView.render(this.timerModel.remaining, this.timerModel.sessionCounter);
+    this.timerView.renderTimer(this.timerModel.remaining);
   }
-  
-  onAddTask() {
+
+  handleAddTask() {
     const taskInput = document.getElementById("taskInput");
-    const text = taskInput.value.trim();
-    if (text) {
-      this.taskModel.addTask(text);
-      taskInput.value = "";
+    if (!taskInput) return;
+    const val = taskInput.value.trim();
+    if (val) {
+      this.taskModel.addTask(val);
       this.taskView.render(this.taskModel.tasks);
+      taskInput.value = "";
     }
   }
-  
-  onTaskListClick(e) {
-    const index = e.target.dataset.index;
-    if (e.target.textContent === "Edit") {
-      const newTask = prompt("Edit your task:", this.taskModel.tasks[index]);
-      if (newTask !== null && newTask.trim() !== "") {
-        this.taskModel.editTask(index, newTask.trim());
-        this.taskView.render(this.taskModel.tasks);
-      }
-    }
-    if (e.target.textContent === "Delete") {
-      this.taskModel.removeTask(index);
-      this.taskView.render(this.taskModel.tasks);
-    }
+
+  handleEditTask(e) {
+    // e.detail.idx, e.detail.newText
+    const idx = e.detail.idx;
+    const newText = e.detail.newText;
+    this.taskModel.editTask(idx, newText);
+    this.taskView.render(this.taskModel.tasks);
+  }
+
+  handleDeleteTask(e) {
+    const idx = e.detail.idx;
+    this.taskModel.deleteTask(idx);
+    this.taskView.render(this.taskModel.tasks);
   }
 }
-
-/** Контролер для авторизації користувача */
-export function initUserAuth() {
-  // Реєстрація
-  const signupForm = document.getElementById("signupForm");
-  if (signupForm) {
-    const signupMessage = document.getElementById("signupMessage");
-    const userModel = new UserModel();
-    const userView = new UserView(signupForm, signupMessage);
-    
-    signupForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nickname = document.getElementById("nicknameInput")?.value.trim();
-      const gender = document.querySelector('input[name="genderRadio"]:checked')?.value || "";
-      const email = document.getElementById("emailInput")?.value.trim();
-      const phone = document.getElementById("phoneInput")?.value.trim();
-      const password = document.getElementById("passwordInput")?.value.trim();
-      
-      if (!nickname || !gender || !email || !phone || !password) {
-        userView.showMessage("Please fill in all fields.", "danger");
-        return;
-      }
-      userModel.register({ nickname, gender, email, phone, password });
-      userView.showMessage("Registration successful! You can now sign in.", "success");
-      signupForm.reset();
-    });
-  }
-  
-  // Вхід
-  const signinForm = document.getElementById("signinForm");
-  if (signinForm) {
-    const signinMessage = document.getElementById("signinMessage");
-    const userModel = new UserModel();
-    const userView = new UserView(signinForm, signinMessage);
-    
-    signinForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const loginValue = document.getElementById("loginInput")?.value.trim();
-      const passwordValue = document.getElementById("passwordInput")?.value.trim();
-      
-      if (!loginValue || !passwordValue) {
-        userView.showMessage("Please enter both login and password.", "danger");
-        return;
-      }
-      if (userModel.login(loginValue, passwordValue)) {
-        userView.showMessage("Login successful!", "success");
-        setTimeout(() => {
-          window.location.href = "profile.html";
-        }, 1000);
-      } else {
-        userView.showMessage("Invalid credentials.", "danger");
-      }
-    });
-  }
-  
-  // Сторінка профілю
-  const profileContainer = document.getElementById("userProfile");
-  if (profileContainer) {
-    const userModel = new UserModel();
-    if (!userModel.user) {
-      profileContainer.innerHTML = `<div class
