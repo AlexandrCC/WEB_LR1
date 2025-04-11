@@ -1,2 +1,2 @@
 # KPICode.github.io
-ПІБ та група - Савельєв О С кв-22, Назва лаб. роботи - Розробка статичного інтерфейсу Web-додатка посилання на звіт https://docs.google.com/document/d/1zGKnvC9G9aqDur8bAtV_LJvuqHIZbsg0Qp1qBhD9eG4/edit?usp=sharing
+ПІБ та група - Савельєв О С кв-22, Назва лаб. роботи - Розробка функціональності Web-додатка мовою Javascript https://docs.google.com/document/d/1zGKnvC9G9aqDur8bAtV_LJvuqHIZbsg0Qp1qBhD9eG4/edit?usp=sharing
